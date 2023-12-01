@@ -1,24 +1,4 @@
-# README
+# HOW TO USE
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+* curl -X POST -F "file=@/path/to/your/image.jpg" http://localhost:3000/api/images
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...

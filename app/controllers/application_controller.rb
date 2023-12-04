@@ -1,23 +1,12 @@
 class ApplicationController < ActionController::API
   include WebApiConstants
-  skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, only: [:restricted]
 
-  def restricted
-    devise_api_token = current_devise_api_token
-    if devise_api_token
-      render json: { message: "You are logged in as #{devise_api_token.resource_owner.email}" }, status: :ok
-    else
-      render json: { message: 'You are not logged in' }, status: :unauthorized
-    end
-  end
 
   def process_image(type, file, endpoint)
     response = upload_image(file)
     uid = JSON.parse(response.body)['data']['uid']
     response = transform_image(uid, endpoint, type)
     trans_id = JSON.parse(response.body)['data']['trans_id']
-    # current_user.images.create(trans_id: trans_id)
     response
   end
 

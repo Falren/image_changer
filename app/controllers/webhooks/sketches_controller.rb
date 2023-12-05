@@ -1,12 +1,16 @@
 module Webhooks 
   class SketchesController < BaseController
     def index
+      return render json: { status: :unprocessable_entity } if image.nil?
+
       response = download_image
-      saved_file_path = Rails.root.join('public', 'uploads', 'test_pic.jpg')
-      File.open(saved_file_path, 'wb') do |file|
-        file.puts response.body
-      end
-      image = File.open(saved_file_path, 'rb')
+      file = StringIO.new(response.body)
+      image.file.attach(
+        io: file, 
+        filename: "image_sketch_#{image.trans_id}.jpg", 
+        content_type: 'image/jpg'
+      )
+      url_for(image.file)
       render json: { status: :ok }
     end
   end

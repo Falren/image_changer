@@ -5,8 +5,7 @@ class ApplicationController < ActionController::API
     response = upload_image(file)
     uid = JSON.parse(response.body)['data']['uid']
     response = transform_image(uid, endpoint, type)
-    trans_id = JSON.parse(response.body)['data']['trans_id']
-    response
+    JSON.parse(response.body)['data']['trans_id']
   end
 
   private 
@@ -27,7 +26,7 @@ class ApplicationController < ActionController::API
       {
         api_token: ENV['VANCE_API_KEY'],
         uid: uid,
-        webhook: "https://3dfe-212-55-78-50.ngrok-free.app/webhooks/#{endpoint}",
+        webhook: "https://54d8-78-137-9-40.ngrok-free.app/webhooks/#{endpoint}",
         jconfig: JCONFIG[type].to_json
       }
     )

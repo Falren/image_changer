@@ -1,7 +1,6 @@
 class ApplicationController < ActionController::API
   include WebApiConstants
 
-
   def process_image(type, file, endpoint)
     response = upload_image(file)
     uid = JSON.parse(response.body)['data']['uid']

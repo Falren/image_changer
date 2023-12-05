@@ -1,6 +1,6 @@
 module Api
   class ImagesController < ApplicationController
-    before_action :authenticate_user!
+    before_action :authorize_request
     
     def create
       return render json: { error: 'No file uploaded' }, status: :unprocessable_entity unless params[:file].present?
@@ -8,13 +8,21 @@ module Api
       process_image(:cartoonize, params[:file], 'cartoons') 
       render json: { status: :ok }
     end
-  end
 
-  
-  def get_user_from_token
-    jwt_payload = JWT.decode(request.headers['Authorization'].split(' ')[1],
-                             Rails.application.credentials.devise[:jwt_secret_key]).first
-    user_id = jwt_payload['sub']
-    User.find(user_id.to_s)
+    def authorize_request
+      header = request.headers['Authorization']
+      header = header.split(' ').last if header
+      begin
+        @decoded = JWT.decode(
+          request.headers['Authorization'].split(' ')[1],
+          Rails.application.credentials.devise[:jwt_secret_key]
+        ).first
+        @current_user = User.find(@decoded[:user_id])
+      rescue ActiveRecord::RecordNotFound => e
+        render json: { errors: e.message }, status: :unauthorized
+      rescue JWT::DecodeError => e
+        render json: { errors: e.message }, status: :unauthorized
+      end
+    end
   end
 end

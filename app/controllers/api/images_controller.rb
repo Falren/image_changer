@@ -17,7 +17,7 @@ module Api
       header = request.headers['Authorization']
       header = header.split(' ').last if header
       begin
-        @decoded = JWT.decode(request.headers['Authorization'].split(' ')[1],
+        @decoded = JWT.decode(header,
                              Rails.application.credentials.devise[:jwt_secret_key]).first
         user_id = @decoded['sub']
         @current_user = User.find(user_id)

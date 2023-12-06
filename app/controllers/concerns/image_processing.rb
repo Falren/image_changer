@@ -25,7 +25,7 @@ module ImageProcessing
       {
         api_token: ENV['VANCE_API_KEY'],
         uid: uid,
-        webhook: "https://3b99-212-55-78-50.ngrok-free.app/webhooks/#{endpoint}",
+        webhook: "https://0325-178-133-53-50.ngrok-free.app/webhooks/#{endpoint}",
         jconfig: JCONFIG[type].to_json
       }
     )

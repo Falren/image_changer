@@ -7,6 +7,6 @@ class CartoonJob < ApplicationJob
     tmp_image.write response.body
     tmp_image.rewind
     trans_id = process_image(:sketch, tmp_image, 'sketches')
-    image.user.images.create(trans_id: trans_id)
+    image.update(trans_id: trans_id)
   end
 end

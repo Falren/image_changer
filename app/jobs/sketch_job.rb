@@ -4,12 +4,12 @@ class SketchJob < ApplicationJob
   def perform(options)
     image = Image.find_by(id: options["image_id"])
     response = download_image(image.trans_id)
-    file = StringIO.new(response.body)
     image.file.attach(
-      io: file, 
+      io: StringIO.new(response.body), 
       filename: "image_sketch_#{image.trans_id}.jpg", 
       content_type: 'image/jpg'
     )
-    url_for(image.file)
+    image_link = url_for(image.file)
+    ActionCable.server.broadcast("user_image_room:#{image.user_id}", image_link)
   end
 end

@@ -9,7 +9,6 @@ class SketchJob < ApplicationJob
       filename: "image_sketch_#{image.trans_id}.jpg", 
       content_type: 'image/jpg'
     )
-    image_link = url_for(image.file)
-    ActionCable.server.broadcast("user_image_room:#{image.user_id}", image_link)
+    ActionCable.server.broadcast("user_image_room:#{image.user_id}", image.file.url)
   end
 end

@@ -49,3 +49,4 @@ gem 'dotenv-rails'
 gem 'devise'
 gem 'devise-jwt'
 gem 'sidekiq'
+gem "aws-sdk-s3", "~> 1.141"

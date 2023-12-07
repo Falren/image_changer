@@ -1,6 +1,4 @@
 module WebApiConstants
-  extend ActiveSupport::Concern
-
   BASE_URL = 'https://api-service.vanceai.com/web_api/v1/'
 
   API_URL = {

@@ -1,14 +1,10 @@
 module Webhooks 
   class CartoonsController < BaseController
     def index
-      response = download_image
-      saved_file_path = Rails.root.join('public', 'uploads', 'test_pic.jpg')
-      File.open(saved_file_path, 'wb') do |file|
-        file.puts response.body
-      end
-      image = File.open(saved_file_path, 'rb')
-      process_image(:sketch, image, 'sketches')
-      render json: { status: :ok }
+      return render json: { status: :unprocessable_entity } if image.nil?
+      
+      CartoonJob.perform_async(image_id: image.id)
+      render json: { status: :ok } 
     end
   end
 end

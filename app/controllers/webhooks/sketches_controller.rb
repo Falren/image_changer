@@ -1,12 +1,9 @@
 module Webhooks 
   class SketchesController < BaseController
     def index
-      response = download_image
-      saved_file_path = Rails.root.join('public', 'uploads', 'test_pic.jpg')
-      File.open(saved_file_path, 'wb') do |file|
-        file.puts response.body
-      end
-      image = File.open(saved_file_path, 'rb')
+      return render json: { status: :unprocessable_entity } if image.nil?
+
+      SketchJob.perform_async(image_id: image.id)
       render json: { status: :ok }
     end
   end

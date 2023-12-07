@@ -9,6 +9,13 @@ class SketchJob < ApplicationJob
       filename: "image_sketch_#{image.trans_id}.jpg", 
       content_type: 'image/jpg'
     )
-    ActionCable.server.broadcast("user_image_room:#{image.user_id}", image.file.url)
+    broadcast_image_url(image)
+  end
+
+  private 
+  
+  def broadcast_image_url(image)
+    channel_name = "user_image_room:#{image.user_id}"
+    ActionCable.server.broadcast(channel_name, image.file.url)
   end
 end

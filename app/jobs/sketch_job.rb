@@ -3,9 +3,12 @@ class SketchJob < ApplicationJob
 
   def perform(options)
     image = Image.find_by(id: options["image_id"])
-    response = download_image(image.trans_id)
+    image_service = ImageDownloadService.new
+    parsed_response = image_service.call(image)
+    return handle_error(image_service.error) if image_service.error
+    
     image.file.attach(
-      io: StringIO.new(response.body), 
+      io: StringIO.new(parsed_response.body), 
       filename: "image_sketch_#{image.trans_id}.jpg", 
       content_type: 'image/jpg'
     )
@@ -13,9 +16,8 @@ class SketchJob < ApplicationJob
   end
 
   private 
-  
+
   def broadcast_image_url(image)
-    channel_name = "user_image_room:#{image.user_id}"
-    ActionCable.server.broadcast(channel_name, image.file.url)
+    ActionCable.server.broadcast("user_image_room:#{image.user_id}", image.file.url)
   end
 end

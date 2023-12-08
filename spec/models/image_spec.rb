@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Image, type: :model do
-  let(:image) { create(:image) }
+  let(:image) { create(:image, :with_image) }
 
   describe 'Associations' do
     it { expect(described_class.reflect_on_association(:user).macro).to eq(:belongs_to) }
@@ -12,8 +12,6 @@ RSpec.describe Image, type: :model do
   end
 
   describe 'Factory' do
-    it 'is valid' do
-      expect(image).to be_valid
-    end
+    it { expect(image).to be_valid }
   end
 end

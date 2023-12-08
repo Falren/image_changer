@@ -3,8 +3,12 @@ FactoryBot.define do
   factory :image do
     association :user
     trans_id { '1239012iaosd' }
-    after(:build) do |image|
-      image.file.attach(io: File.open(Rails.root.join('spec', 'fixtures', 'files', 'test_image.jpg')), filename: 'test_image.jpg', content_type: 'image/jpeg')
+    trait :with_image do
+      after :build do |image|
+        file_name = 'test_image.jpg'
+        file_path = Rails.root.join('spec', 'fixtures', 'files', file_name)
+        image.file.attach(io: File.open(file_path), filename: file_name, content_type: 'image/jpg')
+      end
     end
   end
 end

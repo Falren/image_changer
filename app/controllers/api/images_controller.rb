@@ -6,8 +6,8 @@ module Api
     def create
       return render json: { error: 'No file uploaded' }, status: :unprocessable_entity if params[:file].blank?
 
-      response = process_image(:cartoonize, params[:file], 'cartoons') 
-
+      file = FileCompressorService.new.call(params[:file])
+      response = process_image(:cartoonize, file, 'cartoons') 
       return render json: { error: response['msg'] }, status: :unprocessable_entity if response['code'] != 200
       return render json: { status: :ok } if @current_user.images.create(trans_id: response['data']['trans_id'])
       

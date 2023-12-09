@@ -16,7 +16,7 @@ RSpec.describe Api::ImagesController do
       before { send_request }
 
       it { is_expected.to have_http_status(:unprocessable_entity) }
-      it { expect(JSON.parse(response.body)['error']).to eq('No file uploaded')}
+      it { expect(JSON.parse(response.body)['error']).to eq('No file uploaded') }
     end
 
     context 'with file' do

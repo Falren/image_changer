@@ -1,12 +1,15 @@
 module Api
   class ImagesController < ApplicationController
+    include ImageProcessing
     before_action :authorize_request
     
     def create
       return render json: { error: 'No file uploaded' }, status: :unprocessable_entity if params[:file].blank?
 
-      trans_id = process_image(:cartoonize, params[:file], 'cartoons') 
-      return render json: { status: :ok } if @current_user.images.create(trans_id: trans_id)
+      response = process_image(:cartoonize, params[:file], 'cartoons') 
+
+      return render json: { error: response['msg'] }, status: :unprocessable_entity if response['code'] != 200
+      return render json: { status: :ok } if @current_user.images.create(trans_id: response['data']['trans_id'])
       
       render json: { status: :unprocessable_entity }
     end

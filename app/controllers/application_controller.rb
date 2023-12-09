@@ -1,3 +1,1 @@
-class ApplicationController < ActionController::API
-  include ImageProcessing
-end
+class ApplicationController < ActionController::API; end

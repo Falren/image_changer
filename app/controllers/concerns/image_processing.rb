@@ -3,10 +3,10 @@ module ImageProcessing
   include WebApiConstants
   
   def process_image(type, file, endpoint)
-    response = upload_image(file)
-    uid = JSON.parse(response.body)['data']['uid']
-    response = transform_image(uid, endpoint, type)
-    JSON.parse(response.body)['data']['trans_id']
+    parsed_response = JSON.parse(upload_image(file).body)
+    return parsed_response if parsed_response['code'] != 200
+
+    JSON.parse(transform_image(parsed_response['data']['uid'], endpoint, type)) 
   end
   
   def upload_image(file)

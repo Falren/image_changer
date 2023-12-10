@@ -9,37 +9,33 @@ RSpec.describe CartoonJob, type: :job do
     let(:failure_response) {{"code" => 400}}
     
     before do
+      allow(subject).to receive(:process_temp_image).and_return(tmp_image)
       allow_any_instance_of(ImageDownloadService).to receive_messages(:call => nil, :error => nil)
-      allow(subject).to receive(:process_temp_image).and_return(success_response)
+      allow_any_instance_of(ImageProcessService).to receive_messages(:call => success_response, :error => nil)
+      subject.perform(options)
     end
 
-    it 'updates the image trans_id' do
-      subject.perform(options)
 
-      expect(image.reload.trans_id).to eq("new_trans_id")
+    context 'updates the image trans_id' do
+      it { expect(image.reload.trans_id).to eq("new_trans_id") }
     end
 
     context 'failed to update' do
-      before { allow(image).to receive(:update)}
+      
+      before { allow(image).to receive(:update) } 
       
       context 'when image is not found' do
+       
         before  { allow_any_instance_of(ImageDownloadService).to receive(:error).and_return('ERROR') }
 
-        it 'does not update the image' do
-          subject.perform(options)
-
-          expect(image).to_not have_received(:update).with(trans_id: "new_trans_id")
-        end
+        it { expect(image).to_not have_received(:update).with(trans_id: "new_trans_id") }
       end
 
       context 'when process_temp_image returns nil' do
+        
         before { allow(subject).to receive(:process_temp_image).and_return(failure_response) }
 
-        it 'does not update the image' do
-          subject.perform(options)
-
-          expect(image).to_not have_received(:update).with(trans_id: "new_trans_id")
-        end
+        it { expect(image).to_not have_received(:update).with(trans_id: "new_trans_id") }
       end
     end
   end

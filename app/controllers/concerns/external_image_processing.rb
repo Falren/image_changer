@@ -1,14 +1,6 @@
-module ImageProcessing
-  extend ActiveSupport::Concern
+module ExternalImageProcessing
   include WebApiConstants
-  
-  def process_image(type, file, endpoint)
-    parsed_response = JSON.parse(upload_image(file).body)
-    return parsed_response if parsed_response['code'] != 200
 
-    JSON.parse(transform_image(parsed_response['data']['uid'], endpoint, type)) 
-  end
-  
   def upload_image(file)
     RestClient.post(
       BASE_URL + API_URL[:upload],

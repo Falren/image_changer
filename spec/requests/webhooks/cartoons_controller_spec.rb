@@ -1,18 +1,23 @@
 require 'rails_helper'
 
-RSpec.describe Webhooks::CartoonsController, type: :request do
-  describe 'GET /webhooks/cartoons' do
-    let(:image) { create(:image) }
-
-    it 'returns a successful response and enqueues CartoonJob' do
-      get '/webhooks/cartoons', params: { trans_id: image.trans_id }
-      expect(response).to have_http_status(:ok)
+RSpec.describe Webhooks::CartoonsController do
+  let(:image) { create(:image) }
+  subject { response }
+  
+  describe 'GET#index' do  
+    
+    before { send_request }
+  
+    context 'with  a successful response' do
+      let(:send_request) { get '/webhooks/cartoons', params: { trans_id: image.trans_id } }
+      
+      it { is_expected.to have_http_status(:ok) }
     end
 
-    it 'returns unprocessable_entity if image is nil' do
-      get '/webhooks/cartoons'
+    context 'with an unsucssesful reponse' do
+      let(:send_request) { get '/webhooks/cartoons' }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      it { is_expected.to have_http_status(:unprocessable_entity) } 
     end
   end
 end

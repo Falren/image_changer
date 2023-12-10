@@ -11,14 +11,14 @@ RSpec.describe SketchJob, type: :job do
     end
     
     context 'file attached' do
-      before { allow_any_instance_of(ImageDownloadService).to receive(:error).and_return(nil) }
-      it 'downloads and attaches the sketch image to the image' do
+      before do 
+        allow_any_instance_of(ImageDownloadService).to receive(:error).and_return(nil) 
         subject.perform(options)
-
-        expect(image.file).to be_attached
-        expect(image.file.content_type).to eq('image/jpg')
-        expect(image.file.filename.to_s).to eq("image_sketch_#{image.trans_id}.jpg")
       end
+
+      it { expect(image.file).to be_attached }
+      it { expect(image.file.content_type).to eq('image/jpg') }
+      it { expect(image.file.filename.to_s).to eq("image_sketch_#{image.trans_id}.jpg") }
     end
 
     context 'file not attached' do

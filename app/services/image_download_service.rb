@@ -1,6 +1,6 @@
 class ImageDownloadService
   attr_accessor :error
-  include ImageProcessing
+  include ExternalImageProcessing
 
   def call(image)
     return set_error('No image provided') if image.nil?

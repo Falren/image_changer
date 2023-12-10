@@ -11,33 +11,24 @@ RSpec.describe Users::SessionsController, type: :request do
       password: user.password
     }}
   end
-
-  describe 'POST /users/sing_in' do 
+  
+  describe 'POST#create' do 
+    
+    before { send_request }
+    
     context 'when params are correct' do
-      before do
-        post sign_in_url, params: params
-      end
+      let(:send_request) { post sign_in_url, params: params }
+      let(:decoded_token) { JWT.decode(response.headers['authorization'].split(' ').last, Rails.application.credentials.devise[:jwt_secret_key], true) }
 
-      it 'returns 200' do
-        expect(response).to have_http_status(200)
-      end
-
-      it 'returns JTW token in authorization header' do
-        expect(response.headers['authorization']).to be_present
-      end
-
-      it 'returns valid JWT token' do
-        decoded_token = JWT.decode(response.headers['authorization'].split(' ').last, Rails.application.credentials.devise[:jwt_secret_key], true)
-        expect(decoded_token.first['sub']).to be_present
-      end
+      it { expect(response).to have_http_status(200) }
+      it { expect(response.headers['authorization']).to be_present }
+      it { expect(decoded_token.first['sub']).to be_present }
     end
 
     context 'when login params are incorrect' do
-      before { post sign_in_url }
+      let(:send_request) { post sign_in_url }
       
-      it 'returns unathorized status' do
-        expect(response.status).to eq 401
-      end
+      it { expect(response).to have_http_status(401) }
     end
   end
 end

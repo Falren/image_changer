@@ -1,12 +1,14 @@
 class CartoonJob < ApplicationJob
   def perform(options)
     image = Image.find_by(id: options["image_id"])
-    image_service = ImageDownloadService.new
-    parsed_response = image_service.call(image)
-    return handle_error(image_service.error) if image_service.error
+    image_download = ImageDownloadService.new
+    parsed_response = image_download.call(image)
+    return handle_error(image_download.error) if image_download.error
     
-    response = process_temp_image(image.trans_id, parsed_response)
-    return handle_error(response['msg']) if response['code'] != 200
+    image_process = ImageProcessService.new
+    tmp_file = process_temp_image(image.trans_id, parsed_response)
+    response = image_process.call(:sketch, tmp_file, 'sketches')
+    return handle_error(image_process.error) if image_process.error
 
     image.update(trans_id: response['data']['trans_id'])
   end
@@ -22,6 +24,6 @@ class CartoonJob < ApplicationJob
     tmp_image.set_encoding('ASCII-8BIT')
     tmp_image.write response.body
     tmp_image.rewind
-    process_image(:sketch, tmp_image, 'sketches')
+    tmp_image
   end
 end

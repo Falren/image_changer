@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Api::ImagesController do
   subject { response } 
+
   describe 'POST#create' do
     let!(:user) { create(:user) }
     let(:jwt_token) { JWT.encode({ sub: user.id }, Rails.application.credentials.devise[:jwt_secret_key]) }
@@ -21,13 +22,23 @@ RSpec.describe Api::ImagesController do
 
     context 'with file' do
       let(:send_request) { post '/api/images', params: { file: file }, headers: headers }
-    
+      
       before do
-        allow_any_instance_of(Api::ImagesController).to receive(:process_image).and_return(success_response) 
+        allow(ImageProcessService).to receive(:new).and_return(image_process_service)
         send_request
       end
 
-      it { is_expected.to have_http_status(:ok) }
+      context 'when success' do
+        let(:image_process_service) { instance_double(ImageProcessService, error: nil, call: success_response)}
+        
+        it { is_expected.to have_http_status(:ok) }
+      end
+
+      context 'when failure' do
+        let(:image_process_service) { instance_double(ImageProcessService, error: 'Error', call: 'Error')}
+        
+        it { is_expected.to have_http_status(:unprocessable_entity) }
+      end
     end
 
     context 'when authorization fails' do

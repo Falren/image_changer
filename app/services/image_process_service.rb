@@ -1,7 +1,7 @@
 class ImageProcessService
+  include ExternalImageProcessing
   attr_accessor :error
-  include ImageProcessing
-
+  
   def call(type, file, endpoint)
     parsed_response = JSON.parse(upload_image(file).body)
     return set_error(parsed_response['msg']) if parsed_response['code'] != 200

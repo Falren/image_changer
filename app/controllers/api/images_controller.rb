@@ -4,10 +4,13 @@ module Api
     before_action :authorize_request
     
     def create
+      return broadcast_image if Rails.env.development?
       return render json: { error: 'No file uploaded' }, status: :unprocessable_entity if params[:file].blank?
-      return render json: { error: credit_validation_service.error } if credit_validation_service.call(current_user)
       
-      file = ImageCompressService.new.call(params[:file])
+      credit_validation_service.call(current_user)
+      return render json: { error: credit_validation_service.error }, status: :unprocessable_entity if credit_validation_service.error
+      
+      file = image_compress_service.call(params[:file])
       response = image_process_service.call(:cartoonize, file, 'cartoons')
       return render json: { error: image_process_service.error }, status: :unprocessable_entity if image_process_service.error
       return head :ok if @current_user.images.create(trans_id: response['data']['trans_id'])
@@ -16,7 +19,19 @@ module Api
     end
 
     private
+    
+    def broadcast_image
+      ActionCable.server.broadcast(
+        "user_image_room:#{current_user.id}",
+        Rails.root.join('spec', 'fixtures', 'files', 'test_image.jpg')
+      )
+      head :ok
+    end
 
+    def image_compress_service
+      image_compress_service ||= ImageCompressService.new
+    end
+    
     def image_process_service
       image_process_service ||= ImageProcessService.new
     end

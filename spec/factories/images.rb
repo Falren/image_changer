@@ -1,4 +1,3 @@
-# spec/factories/images.rb
 FactoryBot.define do
   factory :image do
     association :user

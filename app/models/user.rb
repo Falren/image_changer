@@ -1,13 +1,11 @@
 class User < ApplicationRecord
   TRIAL_CREDIT = 10
-  devise :database_authenticatable, :registerable,
-         :jwt_authenticatable,
-         jwt_revocation_strategy: JwtDenylist
+  devise :database_authenticatable, :registerable, :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
   
   has_many :images
   has_one :user_subscription
   has_one :subscription, through: :user_subscription
-  validates :name, :age, :email, presence: true
+  validates :email, presence: true, uniqueness: true
 
   after_create :assign_trial_subscription
 

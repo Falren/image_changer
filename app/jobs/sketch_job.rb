@@ -3,9 +3,11 @@ class SketchJob < ApplicationJob
 
   def perform(options)
     image = Image.find_by(id: options["image_id"])
-    image_service = ImageDownloadService.new
-    parsed_response = image_service.call(image)
-    return handle_error(image_service.error) if image_service.error
+    credit_validation_service.call(image)
+    return handle_error(credit_validation_service.error) if credit_validation_service.error
+    
+    parsed_response = image_download_service.call(image)
+    return handle_error(image_download_service.error) if image_download_service.error
     
     image.file.attach(
       io: StringIO.new(parsed_response.body), 
@@ -13,9 +15,18 @@ class SketchJob < ApplicationJob
       content_type: 'image/jpg'
     )
     broadcast_image_url(image)
+    image.user_subscription.decrement!(:credit, 1)
   end
 
   private 
+
+  def image_download_service
+    image_download_service ||= ImageDownloadService.new
+  end
+
+  def credit_validation_service
+    credit_validation_service ||= CreditValidationService.new
+  end
 
   def broadcast_image_url(image)
     ActionCable.server.broadcast("user_image_room:#{image.user_id}", image.file.url)

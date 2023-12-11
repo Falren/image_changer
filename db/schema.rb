@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_12_05_131417) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_11_130339) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -58,6 +58,22 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_05_131417) do
     t.index ["jti"], name: "index_jwt_denylist_on_jti"
   end
 
+  create_table "subscriptions", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_subscriptions", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "subscription_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "credit", default: 0
+    t.index ["subscription_id"], name: "index_user_subscriptions_on_subscription_id"
+    t.index ["user_id"], name: "index_user_subscriptions_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -75,4 +91,6 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_05_131417) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "images", "users"
+  add_foreign_key "user_subscriptions", "subscriptions"
+  add_foreign_key "user_subscriptions", "users"
 end

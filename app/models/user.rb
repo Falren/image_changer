@@ -6,4 +6,5 @@ class User < ApplicationRecord
          jwt_revocation_strategy: JwtDenylist
   
   has_many :images
+  has_many :subscriptions, through: :user_subscriptions
 end

@@ -1,5 +1,6 @@
 class SketchJob < ApplicationJob
   include Rails.application.routes.url_helpers
+  sidekiq_options retry: false
 
   def perform(options)
     image = Image.find_by(id: options["image_id"])
@@ -15,17 +16,17 @@ class SketchJob < ApplicationJob
       content_type: 'image/jpg'
     )
     broadcast_image_url(image)
-    image.user_subscription.decrement!(:credit, 1)
+    image.user_subscription.update(credit: image.user_subscription.credit - 1)
   end
 
   private 
 
   def image_download_service
-    image_download_service ||= ImageDownloadService.new
+    @image_download_service ||= ImageDownloadService.new
   end
 
   def credit_validation_service
-    credit_validation_service ||= CreditValidationService.new
+    @credit_validation_service ||= CreditValidationService.new
   end
 
   def broadcast_image_url(image)

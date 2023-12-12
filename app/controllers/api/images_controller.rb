@@ -21,23 +21,20 @@ module Api
     private
     
     def broadcast_image
-      ActionCable.server.broadcast(
-        "user_image_room:#{current_user.id}",
-        Rails.root.join('spec', 'fixtures', 'files', 'test_image.jpg')
-      )
+      ActionCable.server.broadcast("user_image_room:#{current_user.id}", ENV['TEST_IMAGE_URL'])
       head :ok
     end
 
     def image_compress_service
-      image_compress_service ||= ImageCompressService.new
+      @image_compress_service ||= ImageCompressService.new
     end
     
     def image_process_service
-      image_process_service ||= ImageProcessService.new
+      @image_process_service ||= ImageProcessService.new
     end
 
     def credit_validation_service
-      credit_validation_service ||= CreditValidationService.new
+      @credit_validation_service ||= CreditValidationService.new
     end
 
     def authorize_request

@@ -1,19 +1,27 @@
 class CartoonJob < ApplicationJob
+  sidekiq_options retry: false
+
   def perform(options)
     image = Image.find_by(id: options["image_id"])
-    image_download = ImageDownloadService.new
-    parsed_response = image_download.call(image)
-    return handle_error(image_download.error) if image_download.error
+    parsed_response = image_download_service.call(image)
+    return handle_error(image_download_service.error) if image_download_service.error
     
-    image_process = ImageProcessService.new
     tmp_file = process_temp_image(image.trans_id, parsed_response)
-    response = image_process.call(:sketch, tmp_file, 'sketches')
-    return handle_error(image_process.error) if image_process.error
+    response = image_process_service.call(:sketch, tmp_file, 'sketches')
+    return handle_error(image_process_service.error) if image_process_service.error
 
     image.update(trans_id: response['data']['trans_id'])
   end
 
   private
+
+  def image_download_service
+    @image_download_service ||= ImageDownloadService.new
+  end
+
+  def image_process_service
+    @image_process_service ||= ImageProcessService.new
+  end
 
   def find_image(image_id)
     Image.find_by(id: image_id)

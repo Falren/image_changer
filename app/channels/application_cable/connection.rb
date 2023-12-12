@@ -14,7 +14,7 @@ module ApplicationCable
       token = request.params['token']
       token = token.split(' ').last if token
       begin
-        @decoded = JWT.decode(token, Rails.application.credentials.devise[:jwt_secret_key]).first
+        @decoded = JWT.decode(token, ENV["JWT_SECRET_KEY"]).first
         user_id = @decoded['sub']
         @current_user = User.find(user_id)
       rescue ActiveRecord::RecordNotFound => e

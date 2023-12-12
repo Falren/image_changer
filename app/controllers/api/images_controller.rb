@@ -41,8 +41,7 @@ module Api
       header = request.headers['Authorization']
       header = header.split(' ').last if header
       begin
-        @decoded = JWT.decode(header,
-                             Rails.application.credentials.devise[:jwt_secret_key]).first
+        @decoded = JWT.decode(header, ENV["JWT_SECRET_KEY"]).first
         user_id = @decoded['sub']
         @current_user = User.find(user_id)
       rescue ActiveRecord::RecordNotFound => e

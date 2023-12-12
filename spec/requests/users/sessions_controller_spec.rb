@@ -18,7 +18,7 @@ RSpec.describe Users::SessionsController, type: :request do
     
     context 'when params are correct' do
       let(:send_request) { post sign_in_url, params: params }
-      let(:decoded_token) { JWT.decode(response.headers['authorization'].split(' ').last, Rails.application.credentials.devise[:jwt_secret_key], true) }
+      let(:decoded_token) { JWT.decode(response.headers['authorization'].split(' ').last, ENV["JWT_SECRET_KEY"], true) }
 
       it { expect(response).to have_http_status(200) }
       it { expect(response.headers['authorization']).to be_present }

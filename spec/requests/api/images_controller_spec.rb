@@ -5,7 +5,7 @@ RSpec.describe Api::ImagesController do
 
   describe 'POST#create' do
     let!(:user) { create(:user) }
-    let(:jwt_token) { JWT.encode({ sub: user.id }, Rails.application.credentials.devise[:jwt_secret_key]) }
+    let(:jwt_token) { JWT.encode({ sub: user.id }, ENV["JWT_SECRET_KEY"]) }
     let(:file_path) { Rails.root.join('spec', 'fixtures', 'files', 'test_image.jpg') }
     let(:file) { fixture_file_upload(file_path) }
     let(:success_response) { {"code" => 200, "data" => {"trans_id" => "new_trans_id"}} }

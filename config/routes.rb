@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     resources :images, only: [:create, :index]
+    resources :users, only: :index
   end
 
   namespace :webhooks do
